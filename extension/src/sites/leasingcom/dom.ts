@@ -5,20 +5,38 @@ export const DEAL_CARD_SELECTOR =
   'li.deal-card-v2, [data-test="search-result-item"]';
 export const MODEL_CARD_SELECTOR = "div.deal-card[data-test-manufacturer-slug]";
 
+/** Deal cost terms plus the annual mileage (NaN when the card omits it). */
+export interface ExtractedDeal extends DealTerms {
+  mileage: number;
+}
+
+/** "5,000" or "5k" -> 5000. */
+function parseMileage(s: unknown): number {
+  const cleaned = String(s ?? "").trim().replace(/,/g, "");
+  const m = cleaned.match(/^(\d+(?:\.\d+)?)(k?)$/i);
+  if (!m) return NaN;
+  return parseFloat(m[1]) * (m[2] ? 1000 : 1);
+}
+
 /**
- * Pull term, initial rental, monthly price and fees out of a deal card.
- * Preferred source is the data attributes leasing.com puts on the term list
- * (data-term, data-initialrental); each number independently falls back to a
- * regex over the card's visible text so a markup change degrades gracefully.
+ * Pull term, initial rental, monthly price, fees and mileage out of a deal
+ * card. Preferred source is the data attributes leasing.com puts on the term
+ * list (data-term, data-initialrental, data-mileage); each number
+ * independently falls back to a regex over the card's visible text so a
+ * markup change degrades gracefully.
  */
-export function extractDealTerms(card: Element): DealTerms {
+export function extractDealTerms(card: Element): ExtractedDeal {
   const termEl = card.querySelector("[data-term]");
   const initEl = card.querySelector("[data-initialrental]");
+  const mileageEl = card.querySelector("[data-mileage]");
   let term = termEl
     ? parseInt(termEl.getAttribute("data-term") ?? "", 10)
     : NaN;
   let initial = initEl
     ? parseMoney(initEl.getAttribute("data-initialrental"))
+    : NaN;
+  let mileage = mileageEl
+    ? parseMileage(mileageEl.getAttribute("data-mileage"))
     : NaN;
 
   const priceEl = card.querySelector(".price");
@@ -52,8 +70,12 @@ export function extractDealTerms(card: Element): DealTerms {
     const m = text.match(/additional fees:?\s*£\s*([\d,]+(?:\.\d+)?)/i);
     fees = m ? parseMoney(m[1]) : 0; // some deals genuinely have no fee line
   }
+  if (!Number.isFinite(mileage)) {
+    const m = text.match(/([\d,]+k?)\s*miles\s*p\/a/i);
+    if (m) mileage = parseMileage(m[1]);
+  }
 
-  return { term, initial, monthly, fees };
+  return { term, initial, monthly, fees, mileage };
 }
 
 export interface ModelCardInfo {

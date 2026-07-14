@@ -7,31 +7,54 @@
 /** Contract lengths leasing sites offer; 0 means "no limit" in settings. */
 export const TERM_OPTIONS = [18, 24, 36, 48] as const;
 
+/** Annual mileage allowances leasing.com offers as search filters. */
+export const MILEAGE_OPTIONS = [
+  5000, 6000, 8000, 10000, 12000, 15000, 20000, 25000, 30000,
+] as const;
+
 export interface Settings {
   /** Minimum contract length in months; 0 = no minimum. */
   minTerm: number;
   /** Maximum contract length in months; 0 = no maximum. */
   maxTerm: number;
-  /** What to do with deal cards outside the term range. */
+  /** Minimum annual mileage; 0 = no minimum. */
+  minMileage: number;
+  /** Maximum annual mileage; 0 = no maximum. */
+  maxMileage: number;
+  /** What to do with deal cards outside the term/mileage range. */
   mode: "dim" | "hide";
 }
 
-export const DEFAULT_SETTINGS: Settings = { minTerm: 0, maxTerm: 0, mode: "dim" };
+export const DEFAULT_SETTINGS: Settings = {
+  minTerm: 0,
+  maxTerm: 0,
+  minMileage: 0,
+  maxMileage: 0,
+  mode: "dim",
+};
 
 const VALID_TERMS = new Set<number>([0, ...TERM_OPTIONS]);
+const VALID_MILEAGES = new Set<number>([0, ...MILEAGE_OPTIONS]);
+
+function sanitizeBound(value: unknown, valid: Set<number>): number {
+  return typeof value === "number" && valid.has(value) ? value : 0;
+}
 
 /** Coerce anything (stored value, form input) into a valid Settings. */
 export function sanitizeSettings(raw: unknown): Settings {
   const r = (raw ?? {}) as Partial<Record<keyof Settings, unknown>>;
-  let minTerm =
-    typeof r.minTerm === "number" && VALID_TERMS.has(r.minTerm) ? r.minTerm : 0;
-  let maxTerm =
-    typeof r.maxTerm === "number" && VALID_TERMS.has(r.maxTerm) ? r.maxTerm : 0;
+  let minTerm = sanitizeBound(r.minTerm, VALID_TERMS);
+  let maxTerm = sanitizeBound(r.maxTerm, VALID_TERMS);
   if (minTerm !== 0 && maxTerm !== 0 && minTerm > maxTerm) {
     [minTerm, maxTerm] = [maxTerm, minTerm];
   }
+  let minMileage = sanitizeBound(r.minMileage, VALID_MILEAGES);
+  let maxMileage = sanitizeBound(r.maxMileage, VALID_MILEAGES);
+  if (minMileage !== 0 && maxMileage !== 0 && minMileage > maxMileage) {
+    [minMileage, maxMileage] = [maxMileage, minMileage];
+  }
   const mode = r.mode === "hide" ? "hide" : "dim";
-  return { minTerm, maxTerm, mode };
+  return { minTerm, maxTerm, minMileage, maxMileage, mode };
 }
 
 export function termAllowed(term: number, s: Settings): boolean {
@@ -40,9 +63,24 @@ export function termAllowed(term: number, s: Settings): boolean {
   return true;
 }
 
+export function mileageAllowed(mileage: number, s: Settings): boolean {
+  if (s.minMileage !== 0 && mileage < s.minMileage) return false;
+  if (s.maxMileage !== 0 && mileage > s.maxMileage) return false;
+  return true;
+}
+
+export function hasMileageBound(s: Settings): boolean {
+  return s.minMileage !== 0 || s.maxMileage !== 0;
+}
+
+/** The catalogue mileages inside the configured range, for API facets. */
+export function mileagesInRange(s: Settings): number[] {
+  return MILEAGE_OPTIONS.filter((m) => mileageAllowed(m, s));
+}
+
 /** Stable key for "annotations were made under these settings". */
 export function settingsSignature(s: Settings): string {
-  return `${s.minTerm}-${s.maxTerm}-${s.mode}`;
+  return `${s.minTerm}-${s.maxTerm}-${s.minMileage}-${s.maxMileage}-${s.mode}`;
 }
 
 function storageAvailable(): boolean {

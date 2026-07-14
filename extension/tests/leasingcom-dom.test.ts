@@ -26,24 +26,30 @@ describe("extractDealTerms", () => {
       initial: 1740,
       monthly: 145,
       fees: 299,
+      mileage: 5000,
     });
   });
 
   it("falls back to text parsing when the markup hooks disappear", () => {
     // Simulate a site redesign: data attributes gone, price/label classes renamed.
     const c = card();
-    c.querySelectorAll("[data-term], [data-initialrental]").forEach((el) => {
-      el.removeAttribute("data-term");
-      el.removeAttribute("data-initialrental");
-    });
+    c.querySelectorAll("[data-term], [data-initialrental], [data-mileage]").forEach(
+      (el) => {
+        el.removeAttribute("data-term");
+        el.removeAttribute("data-initialrental");
+        el.removeAttribute("data-mileage");
+      }
+    );
     c.querySelectorAll(".price").forEach((el) => (el.className = "cost"));
     c.querySelectorAll(".label").forEach((el) => (el.className = "caption"));
 
+    // "5k miles p/a" is the only mileage left in the text.
     expect(extractDealTerms(c)).toEqual({
       term: 24,
       initial: 1740,
       monthly: 145,
       fees: 299,
+      mileage: 5000,
     });
   });
 
@@ -53,6 +59,7 @@ describe("extractDealTerms", () => {
     expect(terms.term).toBeNaN();
     expect(terms.initial).toBeNaN();
     expect(terms.monthly).toBeNaN();
+    expect(terms.mileage).toBeNaN();
     expect(terms.fees).toBe(0); // no fee line means no fee
   });
 });

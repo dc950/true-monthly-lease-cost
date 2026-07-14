@@ -7,6 +7,7 @@ import {
 } from "../../core/cost";
 import { formatGBP, formatGBPWhole } from "../../core/money";
 import {
+  mileageAllowed,
   settingsSignature,
   termAllowed,
   type Settings,
@@ -23,9 +24,16 @@ import {
 
 const MAX_CONCURRENT_CARDS = 2;
 
-/** Dim or hide a deal card whose term falls outside the configured range. */
-function applyTermFilter(card: HTMLElement, term: number, settings: Settings): void {
-  const excluded = Number.isFinite(term) && !termAllowed(term, settings);
+/** Dim or hide a deal card outside the configured term/mileage range. */
+function applyDealFilter(
+  card: HTMLElement,
+  term: number,
+  mileage: number,
+  settings: Settings
+): void {
+  const excluded =
+    (Number.isFinite(term) && !termAllowed(term, settings)) ||
+    (Number.isFinite(mileage) && !mileageAllowed(mileage, settings));
   card.classList.toggle("lrc-dim", excluded && settings.mode === "dim");
   card.classList.toggle("lrc-hide", excluded && settings.mode === "hide");
 }
@@ -33,13 +41,16 @@ function applyTermFilter(card: HTMLElement, term: number, settings: Settings): v
 /** Deal cards carry every number we need; compute and badge synchronously. */
 function annotateDealCard(card: HTMLElement, settings: Settings): void {
   let term: number;
+  let mileage: number;
   if (hasBadge(card)) {
     // Badge content doesn't depend on settings; only the filter needs
-    // re-applying, using the term remembered from the first pass.
+    // re-applying, using the numbers remembered from the first pass.
     term = parseInt(card.dataset.lrcTerm ?? "", 10);
+    mileage = parseInt(card.dataset.lrcMileage ?? "", 10);
   } else {
     const terms = extractDealTerms(card);
     term = terms.term;
+    mileage = terms.mileage;
     if (!isViableDeal(terms)) return; // e.g. grouped "from £X p/m" tiles
 
     const total = totalLeaseCost(terms);
@@ -62,8 +73,11 @@ function annotateDealCard(card: HTMLElement, settings: Settings): void {
       card.querySelector(".price")?.parentElement;
     anchor?.appendChild(badge);
     card.dataset.lrcTerm = String(terms.term);
+    if (Number.isFinite(terms.mileage)) {
+      card.dataset.lrcMileage = String(terms.mileage);
+    }
   }
-  applyTermFilter(card, term, settings);
+  applyDealFilter(card, term, mileage, settings);
 }
 
 function annotateModelCard(
@@ -112,7 +126,7 @@ function pumpQueue(): void {
     const info = extractModelCardInfo(card);
     if (!info) continue;
     inFlight++;
-    bestRealCost(info)
+    bestRealCost(info, settings)
       .then((data) => {
         // Skip if the settings changed again while this was in flight;
         // the newer queue entry will do the annotation.

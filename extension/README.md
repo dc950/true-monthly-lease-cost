@@ -43,11 +43,17 @@ Click the toolbar button for a popup with:
 - **Min / max contract length** (18–48 months, or Any) — deal cards outside the range
   are dimmed or hidden, and model-card badges show the best real monthly among the
   allowed terms only (excluded terms stay visible in the hover breakdown, marked).
+- **Min / max mileage per year** (5,000–30,000, or Any) — deal cards outside the range
+  are dimmed or hidden, and model-card lookups constrain the search itself (the
+  "cheapest real" for each term is then the cheapest *at an allowed mileage*, not the
+  site-wide 5k-mile floor).
 - **Deals outside range: dim or hide.**
 
 Changes save on select and apply immediately to open leasing.com tabs — no refresh.
-Settings live in `storage.sync`. All four term buckets are still fetched and cached for
-model cards, so adjusting the range re-badges instantly without new API requests.
+Settings live in `storage.sync`. All four term buckets are fetched and cached per
+mileage range, so adjusting the *term* range re-badges instantly with no new requests,
+while changing the *mileage* range triggers one fresh (small, cached thereafter) query
+set per model card.
 
 ## Build
 

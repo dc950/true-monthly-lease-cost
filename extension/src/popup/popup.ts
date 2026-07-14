@@ -2,22 +2,31 @@ import {
   loadSettings,
   sanitizeSettings,
   saveSettings,
+  type Settings,
 } from "../settings";
 
-const minSel = document.getElementById("minTerm") as HTMLSelectElement;
-const maxSel = document.getElementById("maxTerm") as HTMLSelectElement;
+const minTermSel = document.getElementById("minTerm") as HTMLSelectElement;
+const maxTermSel = document.getElementById("maxTerm") as HTMLSelectElement;
+const minMileageSel = document.getElementById("minMileage") as HTMLSelectElement;
+const maxMileageSel = document.getElementById("maxMileage") as HTMLSelectElement;
 const modeSel = document.getElementById("mode") as HTMLSelectElement;
 
-function render(s: { minTerm: number; maxTerm: number; mode: string }): void {
-  minSel.value = String(s.minTerm);
-  maxSel.value = String(s.maxTerm);
+const selects = [minTermSel, maxTermSel, minMileageSel, maxMileageSel, modeSel];
+
+function render(s: Settings): void {
+  minTermSel.value = String(s.minTerm);
+  maxTermSel.value = String(s.maxTerm);
+  minMileageSel.value = String(s.minMileage);
+  maxMileageSel.value = String(s.maxMileage);
   modeSel.value = s.mode;
 }
 
 function save(): void {
   const clean = sanitizeSettings({
-    minTerm: parseInt(minSel.value, 10),
-    maxTerm: parseInt(maxSel.value, 10),
+    minTerm: parseInt(minTermSel.value, 10),
+    maxTerm: parseInt(maxTermSel.value, 10),
+    minMileage: parseInt(minMileageSel.value, 10),
+    maxMileage: parseInt(maxMileageSel.value, 10),
     mode: modeSel.value,
   });
   render(clean); // reflect sanitisation (e.g. min/max swapped) back into the UI
@@ -26,7 +35,7 @@ function save(): void {
 
 void loadSettings().then((s) => {
   render(s);
-  for (const el of [minSel, maxSel, modeSel]) {
+  for (const el of selects) {
     el.addEventListener("change", save);
   }
 });

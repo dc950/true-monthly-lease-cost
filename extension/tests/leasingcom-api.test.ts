@@ -6,6 +6,7 @@ import {
   type TermQuote,
 } from "../src/sites/leasingcom/api";
 import type { ModelCardInfo } from "../src/sites/leasingcom/dom";
+import { DEFAULT_SETTINGS } from "../src/settings";
 
 const ioniq: ModelCardInfo = {
   manufacturer: "Hyundai",
@@ -93,6 +94,26 @@ describe("cheapestForTerm", () => {
     expect(body.pagination).toEqual({ itemsPerPage: 1, pageNumber: 1 });
     expect(body.orderBy.fieldName).toBe("totalLeaseCost");
     expect(body.orderBy.direction).toBe("ascending");
+    // No mileage constraint -> no Mileage facet.
+    expect(
+      body.searchCriteria.facets.some(
+        (f: { fieldName: string }) => f.fieldName === "Mileage"
+      )
+    ).toBe(false);
+  });
+
+  it("adds a Mileage facet when mileages are given", async () => {
+    const fetchMock = vi.fn(async () => apiResponse(5374, 24, 145));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await cheapestForTerm(ioniq, 24, [8000, 10000]);
+
+    const [, opts] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    const body = JSON.parse(opts.body as string);
+    expect(body.searchCriteria.facets).toContainEqual({
+      fieldName: "Mileage",
+      selections: ["8000", "10000"],
+    });
   });
 
   it("computes effective monthly from the API's all-in total", async () => {
@@ -136,7 +157,7 @@ describe("bestRealCost", () => {
     const fetchMock = fetchByTerm();
     vi.stubGlobal("fetch", fetchMock);
 
-    const result = await bestRealCost(ioniq);
+    const result = await bestRealCost(ioniq, DEFAULT_SETTINGS);
     expect(fetchMock).toHaveBeenCalledTimes(4);
     expect(result!.best.term).toBe(36);
     expect(result!.best.effective).toBe(300);
@@ -147,10 +168,35 @@ describe("bestRealCost", () => {
     const fetchMock = fetchByTerm();
     vi.stubGlobal("fetch", fetchMock);
 
-    await bestRealCost(ioniq);
-    const again = await bestRealCost(ioniq);
+    await bestRealCost(ioniq, DEFAULT_SETTINGS);
+    const again = await bestRealCost(ioniq, DEFAULT_SETTINGS);
     expect(fetchMock).toHaveBeenCalledTimes(4); // no extra requests
     expect(again!.best.term).toBe(36);
+  });
+
+  it("constrains queries by mileage and caches per mileage range", async () => {
+    const fetchMock = fetchByTerm();
+    vi.stubGlobal("fetch", fetchMock);
+
+    await bestRealCost(ioniq, DEFAULT_SETTINGS);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+
+    const bounded = { ...DEFAULT_SETTINGS, minMileage: 8000, maxMileage: 12000 };
+    await bestRealCost(ioniq, bounded);
+    // Different mileage range -> different cache entry -> four new requests,
+    // each carrying the catalogue mileages inside the range.
+    expect(fetchMock).toHaveBeenCalledTimes(8);
+    for (const call of fetchMock.mock.calls.slice(4)) {
+      const [, opts] = call as unknown as [string, RequestInit];
+      const body = JSON.parse(opts.body as string);
+      expect(body.searchCriteria.facets).toContainEqual({
+        fieldName: "Mileage",
+        selections: ["8000", "10000", "12000"],
+      });
+    }
+
+    await bestRealCost(ioniq, bounded);
+    expect(fetchMock).toHaveBeenCalledTimes(8); // cached now
   });
 
   it("survives individual term buckets failing", async () => {
@@ -161,7 +207,7 @@ describe("bestRealCost", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    const result = await bestRealCost(ioniq);
+    const result = await bestRealCost(ioniq, DEFAULT_SETTINGS);
     expect(result!.perTerm).toHaveLength(3);
     expect(result!.best.term).toBe(24); // 36 gone, next best effective is 400 (tie -> earlier term)
   });
@@ -174,7 +220,7 @@ describe("bestRealCost", () => {
         json: async () => ({ TotalResultCount: 0, Deals: [] }),
       }))
     );
-    expect(await bestRealCost(ioniq)).toBeNull();
+    expect(await bestRealCost(ioniq, DEFAULT_SETTINGS)).toBeNull();
   });
 });
 

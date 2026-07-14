@@ -1,3 +1,8 @@
+import {
+  hasMileageBound,
+  mileagesInRange,
+  type Settings,
+} from "../../settings";
 import type { ModelCardInfo } from "./dom";
 
 /** Contract lengths leasing.com offers as search filters. */
@@ -50,11 +55,14 @@ export function pickBest(
 /**
  * Cheapest deal for one term, via leasing.com's own search API sorted by
  * lowest total cost — within a fixed term that is exactly the lowest
- * effective monthly, so one result per bucket suffices.
+ * effective monthly, so one result per bucket suffices. `mileages`, when
+ * non-null, restricts the search to those annual-mileage allowances (the
+ * API's Mileage facet takes discrete catalogue values).
  */
 export async function cheapestForTerm(
   info: ModelCardInfo,
-  term: number
+  term: number,
+  mileages: number[] | null = null
 ): Promise<TermQuote | null> {
   const facets = [
     { fieldName: "ContractLength", selections: [String(term)] },
@@ -63,6 +71,9 @@ export async function cheapestForTerm(
   ];
   if (info.fuel) {
     facets.push({ fieldName: "FuelType", selections: [info.fuel] });
+  }
+  if (mileages && mileages.length > 0) {
+    facets.push({ fieldName: "Mileage", selections: mileages.map(String) });
   }
 
   const body = {
@@ -101,19 +112,25 @@ export async function cheapestForTerm(
   };
 }
 
-function cacheKey(info: ModelCardInfo): string {
-  return `lrc:${info.manufacturer}|${info.range}|${info.fuel ?? ""}|${info.finance}`;
+function cacheKey(info: ModelCardInfo, settings: Settings): string {
+  // The mileage bounds shape the query itself (unlike terms, which are all
+  // fetched and filtered at display time), so they are part of the key.
+  return (
+    `lrc:${info.manufacturer}|${info.range}|${info.fuel ?? ""}|${info.finance}` +
+    `|m${settings.minMileage}-${settings.maxMileage}`
+  );
 }
 
 /**
  * Best (lowest) effective monthly across all term buckets, with the per-term
- * breakdown. Cached in sessionStorage so repeated visits within a session
- * don't re-query.
+ * breakdown, honouring the settings' mileage bounds. Cached in
+ * sessionStorage so repeated visits within a session don't re-query.
  */
 export async function bestRealCost(
-  info: ModelCardInfo
+  info: ModelCardInfo,
+  settings: Settings
 ): Promise<BestRealCost | null> {
-  const key = cacheKey(info);
+  const key = cacheKey(info, settings);
   try {
     const hit = JSON.parse(sessionStorage.getItem(key) ?? "");
     if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
@@ -123,8 +140,9 @@ export async function bestRealCost(
     /* absent or corrupt cache entry — refetch */
   }
 
+  const mileages = hasMileageBound(settings) ? mileagesInRange(settings) : null;
   const settled = await Promise.allSettled(
-    TERMS.map((t) => cheapestForTerm(info, t))
+    TERMS.map((t) => cheapestForTerm(info, t, mileages))
   );
   const perTerm = settled
     .filter(
