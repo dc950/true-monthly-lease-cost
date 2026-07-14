@@ -36,6 +36,19 @@ advertised headline price, colour-coded:
 Hover the badge for the full breakdown. Deals whose cards lack a term/initial rental
 (e.g. model-level "from £X p/m" tiles) are left untouched.
 
+## Settings
+
+Click the toolbar button for a popup with:
+
+- **Min / max contract length** (18–48 months, or Any) — deal cards outside the range
+  are dimmed or hidden, and model-card badges show the best real monthly among the
+  allowed terms only (excluded terms stay visible in the hover breakdown, marked).
+- **Deals outside range: dim or hide.**
+
+Changes save on select and apply immediately to open leasing.com tabs — no refresh.
+Settings live in `storage.sync`. All four term buckets are still fetched and cached for
+model cards, so adjusting the range re-badges instantly without new API requests.
+
 ## Build
 
 The extension is written in TypeScript and bundled with esbuild into `dist/`:
@@ -73,6 +86,8 @@ Regular Firefox only runs signed extensions. Options:
 ```
 src/
   content.ts             entry point: picks a site adapter, MutationObserver re-scan loop
+  settings.ts            user settings: storage.sync load/save/subscribe + validation
+  popup/                 toolbar popup (popup.html/.ts/.css) editing the settings
   core/money.ts          money parsing + GBP formatting
   core/cost.ts           the lease maths (pure, unit-tested)
   ui/badge.ts            badge DOM construction

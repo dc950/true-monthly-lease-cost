@@ -1,6 +1,6 @@
 {
   "name": "lease-real-cost",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@types/firefox-webext-browser": "^143.0.0",
     "esbuild": "^0.28.1",
     "happy-dom": "^20.10.6",
     "typescript": "^7.0.2",

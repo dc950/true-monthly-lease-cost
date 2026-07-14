@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { bestRealCost, cheapestForTerm } from "../src/sites/leasingcom/api";
+import {
+  bestRealCost,
+  cheapestForTerm,
+  pickBest,
+  type TermQuote,
+} from "../src/sites/leasingcom/api";
 import type { ModelCardInfo } from "../src/sites/leasingcom/dom";
 
 const ioniq: ModelCardInfo = {
@@ -170,5 +175,32 @@ describe("bestRealCost", () => {
       }))
     );
     expect(await bestRealCost(ioniq)).toBeNull();
+  });
+});
+
+describe("pickBest", () => {
+  const quote = (term: number, effective: number): TermQuote => ({
+    term,
+    effective,
+    total: effective * term,
+    monthly: effective * 0.8,
+    mileage: 5000,
+  });
+  const perTerm = [
+    quote(18, 500),
+    quote(24, 400),
+    quote(36, 300),
+    quote(48, 350),
+  ];
+
+  it("picks the lowest effective among allowed terms", () => {
+    expect(pickBest(perTerm, () => true)?.term).toBe(36);
+    expect(pickBest(perTerm, (t) => t <= 24)?.term).toBe(24);
+    expect(pickBest(perTerm, (t) => t >= 48)?.term).toBe(48);
+  });
+
+  it("returns null when no term is allowed", () => {
+    expect(pickBest(perTerm, () => false)).toBeNull();
+    expect(pickBest([], () => true)).toBeNull();
   });
 });

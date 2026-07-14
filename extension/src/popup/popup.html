@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>Lease Real Cost</h1>
+
+  <div class="field">
+    <label for="minTerm">Min contract length</label>
+    <select id="minTerm">
+      <option value="0">Any</option>
+      <option value="18">18 months</option>
+      <option value="24">24 months</option>
+      <option value="36">36 months</option>
+      <option value="48">48 months</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="maxTerm">Max contract length</label>
+    <select id="maxTerm">
+      <option value="0">Any</option>
+      <option value="18">18 months</option>
+      <option value="24">24 months</option>
+      <option value="36">36 months</option>
+      <option value="48">48 months</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="mode">Deals outside range</label>
+    <select id="mode">
+      <option value="dim">Dim</option>
+      <option value="hide">Hide</option>
+    </select>
+  </div>
+
+  <p class="hint">Changes apply immediately to open leasing.com tabs.</p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

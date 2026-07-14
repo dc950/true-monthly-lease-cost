@@ -37,6 +37,16 @@ export interface BestRealCost {
   perTerm: TermQuote[];
 }
 
+/** Lowest effective monthly among the quotes whose term passes the filter. */
+export function pickBest(
+  perTerm: TermQuote[],
+  allowed: (term: number) => boolean
+): TermQuote | null {
+  const candidates = perTerm.filter((q) => allowed(q.term));
+  if (candidates.length === 0) return null;
+  return candidates.reduce((a, b) => (a.effective <= b.effective ? a : b));
+}
+
 /**
  * Cheapest deal for one term, via leasing.com's own search API sorted by
  * lowest total cost — within a fixed term that is exactly the lowest
