@@ -43,10 +43,11 @@ Click the toolbar button for a popup with:
 - **Min / max contract length** (18–48 months, or Any) — deal cards outside the range
   are dimmed or hidden, and model-card badges show the best real monthly among the
   allowed terms only (excluded terms stay visible in the hover breakdown, marked).
-- **Min / max mileage per year** (5,000–30,000, or Any) — deal cards outside the range
-  are dimmed or hidden, and model-card lookups constrain the search itself (the
-  "cheapest real" for each term is then the cheapest *at an allowed mileage*, not the
-  site-wide 5k-mile floor).
+- **Min mileage per year** (5,000–30,000, or Any) — deal cards below the minimum are
+  dimmed or hidden, and model-card lookups constrain the search itself (the "cheapest
+  real" for each term is then the cheapest *at an acceptable mileage*, not the
+  site-wide 5k-mile floor). There is deliberately no maximum: more allowance at the
+  same price is never worse.
 - **Deals outside range: dim or hide.**
 
 Changes save on select and apply immediately to open leasing.com tabs — no refresh.

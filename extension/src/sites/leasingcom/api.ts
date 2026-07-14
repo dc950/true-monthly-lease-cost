@@ -113,11 +113,11 @@ export async function cheapestForTerm(
 }
 
 function cacheKey(info: ModelCardInfo, settings: Settings): string {
-  // The mileage bounds shape the query itself (unlike terms, which are all
-  // fetched and filtered at display time), so they are part of the key.
+  // The mileage bound shapes the query itself (unlike terms, which are all
+  // fetched and filtered at display time), so it is part of the key.
   return (
     `lrc:${info.manufacturer}|${info.range}|${info.fuel ?? ""}|${info.finance}` +
-    `|m${settings.minMileage}-${settings.maxMileage}`
+    `|m${settings.minMileage}`
   );
 }
 

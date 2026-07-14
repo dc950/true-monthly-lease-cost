@@ -17,10 +17,11 @@ export interface Settings {
   minTerm: number;
   /** Maximum contract length in months; 0 = no maximum. */
   maxTerm: number;
-  /** Minimum annual mileage; 0 = no minimum. */
+  /**
+   * Minimum annual mileage; 0 = no minimum. There is deliberately no
+   * maximum: a bigger allowance at the same price is never worse.
+   */
   minMileage: number;
-  /** Maximum annual mileage; 0 = no maximum. */
-  maxMileage: number;
   /** What to do with deal cards outside the term/mileage range. */
   mode: "dim" | "hide";
 }
@@ -29,7 +30,6 @@ export const DEFAULT_SETTINGS: Settings = {
   minTerm: 0,
   maxTerm: 0,
   minMileage: 0,
-  maxMileage: 0,
   mode: "dim",
 };
 
@@ -48,13 +48,9 @@ export function sanitizeSettings(raw: unknown): Settings {
   if (minTerm !== 0 && maxTerm !== 0 && minTerm > maxTerm) {
     [minTerm, maxTerm] = [maxTerm, minTerm];
   }
-  let minMileage = sanitizeBound(r.minMileage, VALID_MILEAGES);
-  let maxMileage = sanitizeBound(r.maxMileage, VALID_MILEAGES);
-  if (minMileage !== 0 && maxMileage !== 0 && minMileage > maxMileage) {
-    [minMileage, maxMileage] = [maxMileage, minMileage];
-  }
+  const minMileage = sanitizeBound(r.minMileage, VALID_MILEAGES);
   const mode = r.mode === "hide" ? "hide" : "dim";
-  return { minTerm, maxTerm, minMileage, maxMileage, mode };
+  return { minTerm, maxTerm, minMileage, mode };
 }
 
 export function termAllowed(term: number, s: Settings): boolean {
@@ -64,13 +60,11 @@ export function termAllowed(term: number, s: Settings): boolean {
 }
 
 export function mileageAllowed(mileage: number, s: Settings): boolean {
-  if (s.minMileage !== 0 && mileage < s.minMileage) return false;
-  if (s.maxMileage !== 0 && mileage > s.maxMileage) return false;
-  return true;
+  return s.minMileage === 0 || mileage >= s.minMileage;
 }
 
 export function hasMileageBound(s: Settings): boolean {
-  return s.minMileage !== 0 || s.maxMileage !== 0;
+  return s.minMileage !== 0;
 }
 
 /** The catalogue mileages inside the configured range, for API facets. */
@@ -80,7 +74,7 @@ export function mileagesInRange(s: Settings): number[] {
 
 /** Stable key for "annotations were made under these settings". */
 export function settingsSignature(s: Settings): string {
-  return `${s.minTerm}-${s.maxTerm}-${s.minMileage}-${s.maxMileage}-${s.mode}`;
+  return `${s.minTerm}-${s.maxTerm}-${s.minMileage}-${s.mode}`;
 }
 
 function storageAvailable(): boolean {

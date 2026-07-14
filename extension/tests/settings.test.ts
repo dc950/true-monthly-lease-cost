@@ -15,7 +15,6 @@ describe("sanitizeSettings", () => {
       minTerm: 24,
       maxTerm: 48,
       minMileage: 8000,
-      maxMileage: 15000,
       mode: "hide",
     };
     expect(sanitizeSettings(s)).toEqual(s);
@@ -30,7 +29,6 @@ describe("sanitizeSettings", () => {
         minTerm: "24",
         maxTerm: 12.5,
         minMileage: "8000",
-        maxMileage: -1,
         mode: "sparkle",
       })
     ).toEqual(DEFAULT_SETTINGS);
@@ -38,23 +36,25 @@ describe("sanitizeSettings", () => {
 
   it("rejects term and mileage values the sites don't offer", () => {
     expect(
-      sanitizeSettings({ minTerm: 23, maxTerm: 49, minMileage: 7000, maxMileage: 9999 })
+      sanitizeSettings({ minTerm: 23, maxTerm: 49, minMileage: 7000 })
     ).toEqual(DEFAULT_SETTINGS);
   });
 
-  it("swaps inverted min/max pairs independently", () => {
+  it("drops the retired maxMileage field from previously stored settings", () => {
     expect(
-      sanitizeSettings({ minTerm: 48, maxTerm: 24, minMileage: 20000, maxMileage: 8000 })
-    ).toEqual({
+      sanitizeSettings({ minMileage: 8000, maxMileage: 15000 })
+    ).toEqual({ ...DEFAULT_SETTINGS, minMileage: 8000 });
+  });
+
+  it("swaps an inverted term pair", () => {
+    expect(sanitizeSettings({ minTerm: 48, maxTerm: 24 })).toEqual({
       ...DEFAULT_SETTINGS,
       minTerm: 24,
       maxTerm: 48,
-      minMileage: 8000,
-      maxMileage: 20000,
     });
   });
 
-  it("does not swap when one bound is 'any'", () => {
+  it("does not swap when one term bound is 'any'", () => {
     expect(sanitizeSettings({ minTerm: 48, minMileage: 30000 })).toEqual({
       ...DEFAULT_SETTINGS,
       minTerm: 48,
@@ -85,21 +85,20 @@ describe("termAllowed", () => {
 });
 
 describe("mileageAllowed / mileagesInRange", () => {
-  it("applies bounds inclusively", () => {
-    const s = { ...DEFAULT_SETTINGS, minMileage: 8000, maxMileage: 15000 };
+  it("applies the minimum inclusively, with no upper bound", () => {
+    const s = { ...DEFAULT_SETTINGS, minMileage: 8000 };
     expect(mileageAllowed(6000, s)).toBe(false);
     expect(mileageAllowed(8000, s)).toBe(true);
-    expect(mileageAllowed(15000, s)).toBe(true);
-    expect(mileageAllowed(20000, s)).toBe(false);
+    expect(mileageAllowed(30000, s)).toBe(true);
   });
 
   it("returns the catalogue subset for the API facet", () => {
-    expect(
-      mileagesInRange({ ...DEFAULT_SETTINGS, minMileage: 8000, maxMileage: 15000 })
-    ).toEqual([8000, 10000, 12000, 15000]);
-    expect(
-      mileagesInRange({ ...DEFAULT_SETTINGS, minMileage: 25000 })
-    ).toEqual([25000, 30000]);
+    expect(mileagesInRange({ ...DEFAULT_SETTINGS, minMileage: 8000 })).toEqual([
+      8000, 10000, 12000, 15000, 20000, 25000, 30000,
+    ]);
+    expect(mileagesInRange({ ...DEFAULT_SETTINGS, minMileage: 25000 })).toEqual([
+      25000, 30000,
+    ]);
     expect(mileagesInRange(DEFAULT_SETTINGS)).toEqual([
       5000, 6000, 8000, 10000, 12000, 15000, 20000, 25000, 30000,
     ]);

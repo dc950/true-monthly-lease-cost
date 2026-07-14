@@ -174,24 +174,24 @@ describe("bestRealCost", () => {
     expect(again!.best.term).toBe(36);
   });
 
-  it("constrains queries by mileage and caches per mileage range", async () => {
+  it("constrains queries by minimum mileage and caches per bound", async () => {
     const fetchMock = fetchByTerm();
     vi.stubGlobal("fetch", fetchMock);
 
     await bestRealCost(ioniq, DEFAULT_SETTINGS);
     expect(fetchMock).toHaveBeenCalledTimes(4);
 
-    const bounded = { ...DEFAULT_SETTINGS, minMileage: 8000, maxMileage: 12000 };
+    const bounded = { ...DEFAULT_SETTINGS, minMileage: 15000 };
     await bestRealCost(ioniq, bounded);
-    // Different mileage range -> different cache entry -> four new requests,
-    // each carrying the catalogue mileages inside the range.
+    // Different mileage bound -> different cache entry -> four new requests,
+    // each carrying every catalogue mileage at or above the minimum.
     expect(fetchMock).toHaveBeenCalledTimes(8);
     for (const call of fetchMock.mock.calls.slice(4)) {
       const [, opts] = call as unknown as [string, RequestInit];
       const body = JSON.parse(opts.body as string);
       expect(body.searchCriteria.facets).toContainEqual({
         fieldName: "Mileage",
-        selections: ["8000", "10000", "12000"],
+        selections: ["15000", "20000", "25000", "30000"],
       });
     }
 

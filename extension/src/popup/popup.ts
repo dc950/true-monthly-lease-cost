@@ -8,16 +8,14 @@ import {
 const minTermSel = document.getElementById("minTerm") as HTMLSelectElement;
 const maxTermSel = document.getElementById("maxTerm") as HTMLSelectElement;
 const minMileageSel = document.getElementById("minMileage") as HTMLSelectElement;
-const maxMileageSel = document.getElementById("maxMileage") as HTMLSelectElement;
 const modeSel = document.getElementById("mode") as HTMLSelectElement;
 
-const selects = [minTermSel, maxTermSel, minMileageSel, maxMileageSel, modeSel];
+const selects = [minTermSel, maxTermSel, minMileageSel, modeSel];
 
 function render(s: Settings): void {
   minTermSel.value = String(s.minTerm);
   maxTermSel.value = String(s.maxTerm);
   minMileageSel.value = String(s.minMileage);
-  maxMileageSel.value = String(s.maxMileage);
   modeSel.value = s.mode;
 }
 
@@ -26,7 +24,6 @@ function save(): void {
     minTerm: parseInt(minTermSel.value, 10),
     maxTerm: parseInt(maxTermSel.value, 10),
     minMileage: parseInt(minMileageSel.value, 10),
-    maxMileage: parseInt(maxMileageSel.value, 10),
     mode: modeSel.value,
   });
   render(clean); // reflect sanitisation (e.g. min/max swapped) back into the UI
