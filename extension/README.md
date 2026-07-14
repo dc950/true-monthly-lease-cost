@@ -7,6 +7,25 @@ monthly cost**, spreading the initial rental and admin fees across the full cont
 real monthly = (initial rental + monthly × (term − 1) + additional fees) / term
 ```
 
+Admin fees are **included** — the badge answers "what does this car actually cost me per
+month of the contract".
+
+Two kinds of cards are handled:
+
+1. **Deal cards** (search results, model pages) — all four numbers are on the card, so
+   the badge is computed directly from what you see.
+2. **Model cards** (category pages like `/cars/electric-leases/`, which only show
+   "Monthly cost from" and "Total lease cost from" — often taken from *two different
+   deals*, with no term shown) — the extension queries leasing.com's own search API once
+   per contract length (18/24/36/48 months, one result each, sorted by lowest total
+   cost) and shows the **best real monthly across all terms**. Within a fixed term,
+   lowest total cost is exactly lowest real monthly, so the result is exact, and it
+   frequently belongs to a different deal than either number on the card (e.g. a
+   category card advertising "£288.56 p/m from" whose genuine cheapest ownership cost is
+   a 48-month deal at £362.06 p/m real). Hover the badge for the per-term breakdown.
+   Results are cached in sessionStorage for 6 hours; requests run at most two cards at
+   a time.
+
 Each badge shows the real monthly figure, the total lease cost, and the markup vs the
 advertised headline price, colour-coded:
 
@@ -54,4 +73,11 @@ cards; full-page navigations re-run the content script automatically.
 - Business deals show ex-VAT figures; the badge maths is still correct but don't compare
   a business badge against a personal one.
 - Mileage differences aren't normalised — a 5k-mile deal will look cheaper than an
-  8k-mile one.
+  8k-mile one. On model cards the "real cost from" is almost always a 5,000-mile deal,
+  matching the "from" semantics of the card's own numbers.
+- Model-card lookups depend on leasing.com's unofficial search API (payload shape
+  captured 2026-07; facet names are case-sensitive). If the API changes, deal-card
+  badges keep working and model-card badges silently stop appearing.
+- Model cards inherit only the `fuel` filter from the card's link; other category
+  filters (body type, budget) aren't passed through yet, so on those pages the badge
+  reflects the model's overall cheapest deals rather than the filtered subset.
