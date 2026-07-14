@@ -1,0 +1,17 @@
+{
+  "name": "lease-real-cost",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "happy-dom": "^20.10.6",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}

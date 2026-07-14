@@ -36,12 +36,24 @@ advertised headline price, colour-coded:
 Hover the badge for the full breakdown. Deals whose cards lack a term/initial rental
 (e.g. model-level "from £X p/m" tiles) are left untouched.
 
+## Build
+
+The extension is written in TypeScript and bundled with esbuild into `dist/`:
+
+```
+npm install
+npm run build      # bundles src/ -> dist/ (content.js + content.css + manifest.json)
+npm test           # vitest unit tests (happy-dom, real-markup fixtures)
+npm run typecheck  # tsc --noEmit
+```
+
 ## Install (temporary, for development)
 
-1. Open Firefox and go to `about:debugging#/runtime/this-firefox`
-2. Click **Load Temporary Add-on…**
-3. Select `manifest.json` in this folder
-4. Browse leasing.com — badges appear on all deal listings
+1. Run `npm run build`
+2. Open Firefox and go to `about:debugging#/runtime/this-firefox`
+3. Click **Load Temporary Add-on…**
+4. Select `dist/manifest.json`
+5. Browse leasing.com — badges appear on all deal listings
 
 Temporary add-ons are removed when Firefox restarts; just reload it the same way.
 
@@ -50,11 +62,28 @@ Temporary add-ons are removed when Firefox restarts; just reload it the same way
 Regular Firefox only runs signed extensions. Options:
 
 - **Firefox Developer Edition or Nightly**: set `xpinstall.signatures.required` to
-  `false` in `about:config`, zip this folder's contents (files at the zip root, not
+  `false` in `about:config`, zip the contents of `dist/` (files at the zip root, not
   inside a subfolder), rename to `.xpi`, and open it with Firefox.
 - **Self-sign via AMO**: create a free account at addons.mozilla.org, submit the zip as
   an *unlisted* add-on, and install the signed `.xpi` it returns. No review queue for
   unlisted self-distribution.
+
+## Code layout
+
+```
+src/
+  content.ts             entry point: picks a site adapter, MutationObserver re-scan loop
+  core/money.ts          money parsing + GBP formatting
+  core/cost.ts           the lease maths (pure, unit-tested)
+  ui/badge.ts            badge DOM construction
+  sites/types.ts         SiteAdapter interface (one per supported site)
+  sites/leasingcom/      leasing.com adapter: dom.ts (card extraction),
+                         api.ts (search API client + cache), index.ts (annotation)
+tests/                   vitest suites; fixtures/ holds real captured card markup
+```
+
+New sites get their own folder under `src/sites/` implementing `SiteAdapter`, plus
+fixture-based extraction tests.
 
 ## How it reads the page
 
