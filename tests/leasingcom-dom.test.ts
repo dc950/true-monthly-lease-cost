@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  extractDealPageInfo,
   extractDealTerms,
   extractModelCardInfo,
 } from "../src/sites/leasingcom/dom";
@@ -61,6 +62,45 @@ describe("extractDealTerms", () => {
     expect(terms.monthly).toBeNaN();
     expect(terms.mileage).toBeNaN();
     expect(terms.fees).toBe(0); // no fee line means no fee
+  });
+});
+
+describe("extractDealPageInfo", () => {
+  beforeEach(() => {
+    document.body.innerHTML = fixture("leasingcom-deal-page.html");
+  });
+
+  it("reads every number from the summary table", () => {
+    expect(extractDealPageInfo(document)).toEqual({
+      term: 24,
+      mileage: 5000,
+      monthly: 166.79,
+      initial: 2001.48, // "12 months = £2,001.48" — the £ amount, not "122001.48"
+      fees: 348,
+      total: 6185.65,
+    });
+  });
+
+  it("yields the real monthly from the page's own total", () => {
+    const info = extractDealPageInfo(document)!;
+    expect(info.total / info.term).toBeCloseTo(257.74, 2);
+  });
+
+  it("computes the total when the summary lacks that row", () => {
+    document
+      .querySelectorAll("li")
+      .forEach((li) =>
+        /total lease cost/i.test(
+          li.querySelector(".label")?.textContent ?? ""
+        ) ? li.remove() : undefined
+      );
+    const info = extractDealPageInfo(document)!;
+    expect(info.total).toBeCloseTo(2001.48 + 166.79 * 23 + 348, 2);
+  });
+
+  it("returns null on pages without a summary table", () => {
+    document.body.innerHTML = "<div><p>a search page</p></div>";
+    expect(extractDealPageInfo(document)).toBeNull();
   });
 });
 

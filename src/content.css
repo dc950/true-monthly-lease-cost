@@ -43,6 +43,13 @@
   text-align: left;
 }
 
+/* leasing.com deal-page price header is a flex row; take a full line. */
+.lrc-badge.lrc-deal-page {
+  flex-basis: 100%;
+  margin-top: 10px;
+  text-align: left;
+}
+
 /* Deal cards outside the configured term range (see toolbar popup). */
 .lrc-dim {
   opacity: 0.35;

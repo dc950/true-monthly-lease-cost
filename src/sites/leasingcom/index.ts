@@ -17,7 +17,9 @@ import type { SiteAdapter } from "../types";
 import { bestRealCost, pickBest, type BestRealCost } from "./api";
 import {
   DEAL_CARD_SELECTOR,
+  DEAL_PAGE_PRICE_SELECTOR,
   MODEL_CARD_SELECTOR,
+  extractDealPageInfo,
   extractDealTerms,
   extractModelCardInfo,
 } from "./dom";
@@ -100,6 +102,46 @@ function annotateModelCard(
   (card.querySelector(".deal-body") ?? card).appendChild(badge);
 }
 
+/**
+ * Individual deal pages: badge the price header(s) with total / term. The
+ * page shows a single fixed deal (other options are separate pages), so no
+ * dim/hide filtering applies here.
+ */
+function annotateDealPage(): void {
+  const info = extractDealPageInfo(document);
+  if (
+    !info ||
+    !Number.isFinite(info.term) ||
+    info.term <= 0 ||
+    !Number.isFinite(info.monthly) ||
+    !Number.isFinite(info.total)
+  ) {
+    return;
+  }
+
+  const real = info.total / info.term;
+  const pct = markupPct(real, info.monthly);
+
+  // Desktop and mobile layouts each have their own price wrap.
+  document
+    .querySelectorAll<HTMLElement>(DEAL_PAGE_PRICE_SELECTOR)
+    .forEach((wrap) => {
+      if (hasBadge(wrap)) return;
+      const badge = buildBadge({
+        main: `${formatGBP(real)} p/m real`,
+        sub: `${formatGBPWhole(info.total)} total · +${pct}% vs headline`,
+        title:
+          `Initial rental ${formatGBP(info.initial)}\n` +
+          `+ ${info.term - 1} payments of ${formatGBP(info.monthly)}\n` +
+          `+ fees ${formatGBP(info.fees)}\n` +
+          `= ${formatGBP(info.total)} over ${info.term} months`,
+        severity: severity(pct),
+      });
+      badge.classList.add("lrc-deal-page");
+      wrap.appendChild(badge);
+    });
+}
+
 // Model cards cost one small API request per term bucket, so process a
 // couple of cards at a time; results are cached in sessionStorage, which also
 // makes re-annotation after a settings change instant.
@@ -135,6 +177,7 @@ export const leasingCom: SiteAdapter = {
   },
   scan(settings) {
     const sig = settingsSignature(settings);
+    annotateDealPage();
     document
       .querySelectorAll<HTMLElement>(DEAL_CARD_SELECTOR)
       .forEach((card) => annotateDealCard(card, settings));

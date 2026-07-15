@@ -22,7 +22,12 @@ breakdown shows the fee implied by the total. Term/mileage settings filters appl
 
 ## leasing.com
 
-Two kinds of cards are handled:
+Three kinds of pages are handled:
+
+0. **Individual deal pages** — the summary table lists everything including the site's
+   own all-in "Total lease cost", so the badge (`total / term`) appears right under the
+   headline price, for both the desktop and mobile layouts. Each deal page is a fixed
+   deal, so the term/mileage filters don't apply there.
 
 1. **Deal cards** (search results, model pages) — all four numbers are on the card, so
    the badge is computed directly from what you see.

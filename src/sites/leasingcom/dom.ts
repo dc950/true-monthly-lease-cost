@@ -78,6 +78,63 @@ export function extractDealTerms(card: Element): ExtractedDeal {
   return { term, initial, monthly, fees, mileage };
 }
 
+export const DEAL_PAGE_SUMMARY_SELECTOR = "ul.data-table.summary";
+export const DEAL_PAGE_PRICE_SELECTOR = ".deal-page-price-wrap";
+
+/** The numbers on an individual deal page's summary table. */
+export interface DealPageInfo {
+  term: number;
+  mileage: number;
+  monthly: number;
+  initial: number;
+  fees: number;
+  /** The page's own all-in "Total lease cost". */
+  total: number;
+}
+
+/**
+ * Individual deal pages list everything in a label/value summary table,
+ * including leasing.com's own all-in total. Returns null when the page has
+ * no summary table (i.e. it isn't a deal page).
+ */
+export function extractDealPageInfo(root: ParentNode): DealPageInfo | null {
+  const summary = root.querySelector(DEAL_PAGE_SUMMARY_SELECTOR);
+  if (!summary) return null;
+
+  const valueOf = (labelRe: RegExp): string => {
+    for (const li of summary.querySelectorAll("li")) {
+      const label = li.querySelector(".label");
+      if (label && labelRe.test(label.textContent ?? "")) {
+        return li.querySelector(".value")?.textContent ?? "";
+      }
+    }
+    return "";
+  };
+  // "12 months = £2,001.48" — take the £ amount, not every digit in the text.
+  const poundsIn = (s: string): number => {
+    const m = s.match(/£\s*([\d,]+(?:\.\d+)?)/);
+    return m ? parseMoney(m[1]) : NaN;
+  };
+
+  const term = parseInt(valueOf(/contract length/i), 10); // "24 months"
+  const mileage = parseMoney(valueOf(/annual mileage/i)); // "5,000 p/a"
+  const monthly = poundsIn(valueOf(/monthly payment/i));
+  const initial = poundsIn(valueOf(/initial rental/i));
+  const feesText = valueOf(/additional fees/i);
+  const fees = /£/.test(feesText) ? poundsIn(feesText) : 0; // absent line = no fee
+  let total = poundsIn(valueOf(/total lease cost/i));
+  if (
+    !Number.isFinite(total) &&
+    Number.isFinite(initial) &&
+    Number.isFinite(monthly) &&
+    Number.isFinite(term)
+  ) {
+    total = initial + monthly * (term - 1) + fees;
+  }
+
+  return { term, mileage, monthly, initial, fees, total };
+}
+
 export interface ModelCardInfo {
   manufacturer: string;
   range: string;
