@@ -1,7 +1,8 @@
 # Lease Real Cost — Firefox extension
 
-Annotates every deal card on [leasing.com](https://leasing.com) with the **true effective
-monthly cost**, spreading the initial rental and admin fees across the full contract term:
+Annotates every deal card on [leasing.com](https://leasing.com) and
+[leaseloco.com](https://www.leaseloco.com) with the **true effective monthly cost**,
+spreading the initial rental and admin fees across the full contract term:
 
 ```
 real monthly = (initial rental + monthly × (term − 1) + additional fees) / term
@@ -9,6 +10,17 @@ real monthly = (initial rental + monthly × (term − 1) + additional fees) / te
 
 Admin fees are **included** — the badge answers "what does this car actually cost me per
 month of the contract".
+
+## leaseloco.com
+
+Deal cards advertise a headline monthly and an all-in total (verified to equal the lease
+payments plus the broker's admin fee where one is charged), so the badge is simply
+`total / term`. The lease profile (term, initial months, mileage) is read from the
+card's deal-configuration URL, which encodes it as e.g. `2-24-5000-12-1`
+(finance–term–mileage–initial months–flag), with text parsing as fallback. The hover
+breakdown shows the fee implied by the total. Term/mileage settings filters apply.
+
+## leasing.com
 
 Two kinds of cards are handled:
 
@@ -99,8 +111,11 @@ src/
   core/cost.ts           the lease maths (pure, unit-tested)
   ui/badge.ts            badge DOM construction
   sites/types.ts         SiteAdapter interface (one per supported site)
+  sites/filter.ts        shared dim/hide filtering for the settings ranges
   sites/leasingcom/      leasing.com adapter: dom.ts (card extraction),
                          api.ts (search API client + cache), index.ts (annotation)
+  sites/leaseloco/       leaseloco.com adapter: dom.ts (card extraction),
+                         index.ts (annotation)
 tests/                   vitest suites; fixtures/ holds real captured card markup
 ```
 

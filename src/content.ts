@@ -8,10 +8,11 @@
  * triggered by our own badge insertions terminates immediately.
  */
 import { loadSettings, onSettingsChanged, type Settings } from "./settings";
+import { leaseLoco } from "./sites/leaseloco";
 import { leasingCom } from "./sites/leasingcom";
 import type { SiteAdapter } from "./sites/types";
 
-const adapters: SiteAdapter[] = [leasingCom];
+const adapters: SiteAdapter[] = [leasingCom, leaseLoco];
 
 const active = adapters.filter((a) => a.matches(location.hostname));
 

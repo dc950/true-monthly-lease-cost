@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Lease Real Cost",
-  "version": "0.5.0",
-  "description": "Shows the true effective monthly cost of lease deals on leasing.com - initial rental and admin fees spread across the full contract term.",
+  "version": "0.6.0",
+  "description": "Shows the true effective monthly cost of lease deals on leasing.com and leaseloco.com - initial rental and admin fees spread across the full contract term.",
   "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html",
@@ -10,7 +10,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://leasing.com/*", "https://www.leasing.com/*"],
+      "matches": [
+        "https://leasing.com/*",
+        "https://www.leasing.com/*",
+        "https://leaseloco.com/*",
+        "https://www.leaseloco.com/*"
+      ],
       "js": ["content.js"],
       "css": ["content.css"],
       "run_at": "document_idle"

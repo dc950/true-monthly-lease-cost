@@ -37,6 +37,12 @@
   margin: 10px 0 0;
 }
 
+/* LeaseLoco cards have their own padding; keep the badge inside it. */
+.lrc-badge.lrc-loco {
+  margin: 8px 12px 12px;
+  text-align: left;
+}
+
 /* Deal cards outside the configured term range (see toolbar popup). */
 .lrc-dim {
   opacity: 0.35;

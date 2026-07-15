@@ -7,12 +7,12 @@ import {
 } from "../../core/cost";
 import { formatGBP, formatGBPWhole } from "../../core/money";
 import {
-  mileageAllowed,
   settingsSignature,
   termAllowed,
   type Settings,
 } from "../../settings";
 import { BADGE_CLASS, buildBadge, hasBadge } from "../../ui/badge";
+import { applyDealFilter } from "../filter";
 import type { SiteAdapter } from "../types";
 import { bestRealCost, pickBest, type BestRealCost } from "./api";
 import {
@@ -23,20 +23,6 @@ import {
 } from "./dom";
 
 const MAX_CONCURRENT_CARDS = 2;
-
-/** Dim or hide a deal card outside the configured term/mileage range. */
-function applyDealFilter(
-  card: HTMLElement,
-  term: number,
-  mileage: number,
-  settings: Settings
-): void {
-  const excluded =
-    (Number.isFinite(term) && !termAllowed(term, settings)) ||
-    (Number.isFinite(mileage) && !mileageAllowed(mileage, settings));
-  card.classList.toggle("lrc-dim", excluded && settings.mode === "dim");
-  card.classList.toggle("lrc-hide", excluded && settings.mode === "hide");
-}
 
 /** Deal cards carry every number we need; compute and badge synchronously. */
 function annotateDealCard(card: HTMLElement, settings: Settings): void {
