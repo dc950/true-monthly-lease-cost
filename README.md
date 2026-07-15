@@ -20,6 +20,14 @@ card's deal-configuration URL, which encodes it as e.g. `2-24-5000-12-1`
 (finance–term–mileage–initial months–flag), with text parsing as fallback. The hover
 breakdown shows the fee implied by the total. Term/mileage settings filters apply.
 
+**Deal-configuration pages** (`…/config`) are badged too, for the currently selected
+options — the badge rebuilds when you change term/mileage/initial. LeaseLoco doesn't
+show the broker fee anywhere on these pages, so: card annotation remembers each deal's
+all-in total (sessionStorage, keyed by the deal hash in the URL), and a config page
+reached from the search results badges the **exact** figure, fee included. Opened
+directly (no cache), the badge falls back to payments-only maths and says
+"excl. broker fee" so it never silently understates.
+
 ## leasing.com
 
 Three kinds of pages are handled:

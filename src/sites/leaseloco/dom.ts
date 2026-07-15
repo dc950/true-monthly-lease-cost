@@ -85,3 +85,69 @@ export function extractLeaseLocoDeal(card: Element): LeaseLocoDeal {
 export function impliedFees(deal: LeaseLocoDeal): number {
   return deal.total - (deal.initialMonths + deal.term - 1) * deal.monthly;
 }
+
+export const CONFIG_PRICE_HEADER_SELECTOR =
+  '[class*="profile-selector-trigger-group_header"]';
+
+/** The numbers available on a deal-configuration page (no fee/total there). */
+export interface ConfigPageInfo {
+  term: number;
+  mileage: number;
+  initialMonths: number;
+  monthly: number;
+  /** Upfront amount as displayed; falls back to initialMonths x monthly. */
+  initialAmount: number;
+}
+
+/**
+ * Extract the selected options from a /config page: the URL profile segment
+ * is primary (it changes with the selection), the page text is the fallback
+ * ("£225.56 / month for 24 months at 5,000 miles per annum",
+ * "£2,706.72 initial payment").
+ */
+export function extractConfigPageInfo(
+  root: ParentNode,
+  pathname: string
+): ConfigPageInfo {
+  const profile = pathname.match(/\/(\d+)-(\d+)-(\d+)-(\d+)-(\d+)\//);
+  let term = profile ? parseInt(profile[2], 10) : NaN;
+  let mileage = profile ? parseInt(profile[3], 10) : NaN;
+  let initialMonths = profile ? parseInt(profile[4], 10) : NaN;
+
+  const titleEl = root.querySelector(
+    '[class*="profile-selector-trigger-group_title"]'
+  );
+  let monthly = NaN;
+  const titleMatch = (titleEl?.textContent ?? "").match(
+    /£\s*([\d,]+(?:\.\d+)?)\s*\/\s*month/i
+  );
+  if (titleMatch) monthly = parseMoney(titleMatch[1]);
+
+  const bodyText = (root as Element | Document)
+    ? ((root as Document).body ?? (root as Element)).textContent ?? ""
+    : "";
+  if (!Number.isFinite(monthly)) {
+    const m = bodyText.match(/£\s*([\d,]+(?:\.\d+)?)\s*\/\s*month/i);
+    if (m) monthly = parseMoney(m[1]);
+  }
+  if (!Number.isFinite(term) || !Number.isFinite(mileage)) {
+    const m = bodyText.match(/for\s+(\d+)\s+months\s+at\s+([\d,]+)\s+miles/i);
+    if (m) {
+      if (!Number.isFinite(term)) term = parseInt(m[1], 10);
+      if (!Number.isFinite(mileage)) mileage = parseMoney(m[2]);
+    }
+  }
+  if (!Number.isFinite(initialMonths)) {
+    const m = bodyText.match(/(\d+)\s*mo(?:nth)?s?\s*initial/i);
+    if (m) initialMonths = parseInt(m[1], 10);
+  }
+
+  let initialAmount = NaN;
+  const initMatch = bodyText.match(
+    /£\s*([\d,]+(?:\.\d+)?)\s*initial payment/i
+  );
+  if (initMatch) initialAmount = parseMoney(initMatch[1]);
+  if (!Number.isFinite(initialAmount)) initialAmount = initialMonths * monthly;
+
+  return { term, mileage, initialMonths, monthly, initialAmount };
+}

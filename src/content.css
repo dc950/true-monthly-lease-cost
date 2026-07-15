@@ -50,6 +50,12 @@
   text-align: left;
 }
 
+/* LeaseLoco config-page price header. */
+.lrc-badge.lrc-loco-config {
+  margin-top: 10px;
+  text-align: left;
+}
+
 /* Deal cards outside the configured term range (see toolbar popup). */
 .lrc-dim {
   opacity: 0.35;

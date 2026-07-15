@@ -3,6 +3,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  hashFromHref,
+  recallTotal,
+  rememberTotal,
+} from "../src/sites/leaseloco/cache";
+import {
+  extractConfigPageInfo,
   extractLeaseLocoDeal,
   impliedFees,
 } from "../src/sites/leaseloco/dom";
@@ -12,6 +18,13 @@ const fixture = readFileSync(
   path.join(here, "fixtures", "leaseloco-deal-card.html"),
   "utf8"
 );
+const configFixture = readFileSync(
+  path.join(here, "fixtures", "leaseloco-config-page.html"),
+  "utf8"
+);
+
+const CONFIG_PATH =
+  "/car-leasing/peugeot/e-3008/157kw-gt-73kwh-5dr-auto/45449/2-24-5000-12-1/1727c075b68e4362ca8cb327f392789e/config";
 
 describe("extractLeaseLocoDeal", () => {
   beforeEach(() => {
@@ -67,5 +80,75 @@ describe("extractLeaseLocoDeal", () => {
     expect(deal.mileage).toBeNaN();
     expect(deal.monthly).toBeNaN();
     expect(deal.total).toBeNaN();
+  });
+});
+
+describe("extractConfigPageInfo", () => {
+  beforeEach(() => {
+    document.body.innerHTML = configFixture;
+  });
+
+  it("reads the profile from the URL and prices from the page", () => {
+    expect(extractConfigPageInfo(document, CONFIG_PATH)).toEqual({
+      term: 24,
+      mileage: 5000,
+      initialMonths: 12,
+      monthly: 225.56,
+      initialAmount: 2706.72,
+    });
+  });
+
+  it("falls back to page text when the URL has no profile segment", () => {
+    // e.g. a future URL scheme change; term/mileage come from
+    // "for 24 months at 5,000 miles per annum", initial months from
+    // "12 mos initial".
+    document.querySelectorAll('[class*="profile-selector-trigger-group_title"]')
+      .forEach((el) => (el.className = "title-x"));
+    const info = extractConfigPageInfo(document, "/some/other/config");
+    expect(info).toEqual({
+      term: 24,
+      mileage: 5000,
+      initialMonths: 12,
+      monthly: 225.56,
+      initialAmount: 2706.72,
+    });
+  });
+
+  it("derives the initial amount when the page omits it", () => {
+    document
+      .querySelectorAll('[class*="compare-deals_sub-title"]')
+      .forEach((el) => el.remove());
+    const info = extractConfigPageInfo(document, CONFIG_PATH);
+    expect(info.initialAmount).toBeCloseTo(12 * 225.56, 2);
+  });
+});
+
+describe("deal-total cache", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
+  it("extracts the deal hash from config hrefs", () => {
+    expect(hashFromHref(CONFIG_PATH)).toBe("1727c075b68e4362ca8cb327f392789e");
+    expect(hashFromHref("/car-leasing/foo/bar")).toBeNull();
+  });
+
+  it("round-trips a remembered total", () => {
+    rememberTotal("abc123def4567890", 8157.4);
+    expect(recallTotal("abc123def4567890")).toBe(8157.4);
+    expect(recallTotal("unknown-hash")).toBeNull();
+  });
+
+  it("expires stale entries", () => {
+    sessionStorage.setItem(
+      "lrcT:oldhash",
+      JSON.stringify({ ts: Date.now() - 7 * 60 * 60 * 1000, total: 8157.4 })
+    );
+    expect(recallTotal("oldhash")).toBeNull();
+  });
+
+  it("ignores non-finite totals", () => {
+    rememberTotal("nanhash", NaN);
+    expect(recallTotal("nanhash")).toBeNull();
   });
 });
