@@ -100,6 +100,13 @@ not the test.
 
 ## Environment gotchas
 
+- Live-site investigation (inspecting card DOM/`__NEXT_DATA__`/XHR traffic, capturing
+  fixtures, injecting the built bundle to verify badges) needs a real browser: the
+  desktop app's browser pane or a Claude-in-Chrome connection. VS Code extension
+  sessions typically have neither — WebFetch only sees static HTML — so do coding/test
+  work there and site investigation in a browser-equipped session. New-site work
+  starts with that investigation (see SITE-PLAN.md).
+
 - PowerShell 5.1 `Get-Content`/`Set-Content` round-trips corrupt UTF-8 (em dashes →
   mojibake). Edit source/JSON with the Write/Edit tools, never PS regex. Multi-line
   git commit messages: write to a file and use `git commit -F <path>`.
