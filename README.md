@@ -163,6 +163,25 @@ not re-deriving.
 Bug reports are most useful with the page URL and what the badge showed versus what the
 site's own checkout says.
 
+## AI disclosure
+
+This extension was built with heavy use of AI assistance (Claude Code) — the site
+investigation, the adapters, the tests and most of this documentation.
+
+That's worth stating plainly, because the output is a number you might make a
+several-thousand-pound decision on. What backs it up:
+
+- Every adapter was checked against the live site, comparing the rendered badge to the
+  broker's own quoted total — not just against its tests. That step caught real bugs the
+  passing test suite could not (see [SITE-PLAN.md](SITE-PLAN.md)).
+- The tests run on **real markup captured from each site**, not synthetic fixtures,
+  including deliberately class-stripped copies to prove the fallback paths work.
+- Fee constants were confirmed across several deals from different funders before being
+  baked in.
+
+None of which makes the code infallible. The advice above — check against the broker's
+own quote before signing — applies regardless of who or what wrote it.
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
