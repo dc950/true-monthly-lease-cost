@@ -10,6 +10,7 @@
 import { loadSettings, onSettingsChanged, type Settings } from "./settings";
 import { leaseLoco } from "./sites/leaseloco";
 import { leasingCom } from "./sites/leasingcom";
+import { leasingOptions } from "./sites/leasingoptions";
 import { nationwideVc } from "./sites/nationwidevc";
 import { selectCarLeasing } from "./sites/selectcarleasing";
 import type { SiteAdapter } from "./sites/types";
@@ -19,6 +20,7 @@ const adapters: SiteAdapter[] = [
   leaseLoco,
   selectCarLeasing,
   nationwideVc,
+  leasingOptions,
 ];
 
 const active = adapters.filter((a) => a.matches(location.hostname));

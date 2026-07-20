@@ -80,6 +80,18 @@
   text-align: left;
 }
 
+/* leasingoptions.co.uk special-offers card. */
+.lrc-badge.lrc-lo {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+/* leasingoptions.co.uk deal-page price block. */
+.lrc-badge.lrc-lo-deal {
+  margin-top: 10px;
+  text-align: left;
+}
+
 /* Deal cards outside the configured term range (see toolbar popup). */
 .lrc-dim {
   opacity: 0.35;

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Lease Real Cost",
-  "version": "0.10.0",
-  "description": "Shows the true effective monthly cost of lease deals on leasing.com, leaseloco.com, selectcarleasing.co.uk and nationwidevehiclecontracts.co.uk - initial rental and admin fees spread across the full contract term.",
+  "version": "0.11.0",
+  "description": "Shows the true effective monthly cost of lease deals on leasing.com, leaseloco.com, selectcarleasing.co.uk, nationwidevehiclecontracts.co.uk and leasingoptions.co.uk - initial rental and admin fees spread across the full contract term.",
   "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html",
@@ -18,7 +18,9 @@
         "https://selectcarleasing.co.uk/*",
         "https://www.selectcarleasing.co.uk/*",
         "https://nationwidevehiclecontracts.co.uk/*",
-        "https://www.nationwidevehiclecontracts.co.uk/*"
+        "https://www.nationwidevehiclecontracts.co.uk/*",
+        "https://leasingoptions.co.uk/*",
+        "https://www.leasingoptions.co.uk/*"
       ],
       "js": ["content.js"],
       "css": ["content.css"],

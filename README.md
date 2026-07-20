@@ -97,6 +97,31 @@ when the cached quote's monthly matches the card's advertised price; if they dif
 profile), the card is left unbadged rather than guessing. In practice: cards get badged
 progressively as you browse into deals and back, not on first load.
 
+## leasingoptions.co.uk
+
+Two kinds of pages are handled:
+
+**Individual deal pages** are badged exactly from what's on the page: the headline
+monthly, and the Finance Summary panel's contract length, annual mileage and initial
+rental (note the panel shows contract length in **years**, converted to months for the
+maths). leasingoptions.co.uk charges a **site-wide £399.99 processing fee** (inc VAT,
+verified across three deals/terms); the Finance Summary panel usually shows the exact
+figure, and the badge uses it — falling back to the constant only on the rare page
+missing that row. The badge rebuilds when you change options (the page soft-navigates
+without a full reload). Deal pages are a fixed deal, so the term/mileage filters don't
+apply there.
+
+**Special-offers listing cards** (`/car-leasing/special-offers`) show no lease numbers
+at all on the card itself — the profile (term, mileage, initial months, monthly) lives
+in the page's embedded `__NEXT_DATA__`, keyed by the vehicle reference in the card's
+title link. Personal Contract Hire (PCH) deals are used; business pricing is ignored.
+The £399.99 fee (never present in `__NEXT_DATA__`, DOM-only elsewhere) is folded in the
+same way as on deal pages, so these badges are exact too. Term/mileage settings filters
+apply.
+
+Not yet handled: manufacturer/category "model preview" pages, which show model-level
+"from" prices in a different data shape.
+
 ## Settings
 
 Click the toolbar button for a popup with:
