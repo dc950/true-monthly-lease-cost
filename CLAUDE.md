@@ -32,10 +32,14 @@ npm run typecheck    # tsc --noEmit (strict)
 Install for development: `about:debugging#/runtime/this-firefox` → Load Temporary
 Add-on → `dist/manifest.json`.
 
-`build.mjs` bundles the two entry points (`content`, `popup`) and **explicitly copies**
-static files (manifest.json, content.css, popup.html, popup.css) into `dist/` — any new
-non-TS asset must be added there or it silently won't ship. Bump the version in both
-`package.json` and `src/manifest.json` when adding a feature.
+`build.mjs` bundles the two entry points (`content`, `popup`), **explicitly copies**
+static files (manifest.json, content.css, popup.html, popup.css) into `dist/`, and
+rasterises `src/icons/icon.svg` into `dist/icon-{16,32,48,96,128}.png` (via `sharp`) —
+any new non-TS asset must be added there or it silently won't ship. The icon is one
+editable SVG; edit it and rebuild rather than touching the PNGs, which are generated and
+gitignored with the rest of `dist/`. Chrome needs PNGs (not SVG), which is why we
+rasterise rather than ship the SVG directly. Bump the version in both `package.json` and
+`src/manifest.json` when adding a feature.
 
 ## Architecture
 

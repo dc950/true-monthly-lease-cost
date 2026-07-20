@@ -4,9 +4,20 @@
   "version": "0.12.0",
   "description": "Shows the true effective monthly cost of lease deals on leasing.com, leaseloco.com, selectcarleasing.co.uk, nationwidevehiclecontracts.co.uk and leasingoptions.co.uk - initial rental and admin fees spread across the full contract term.",
   "permissions": ["storage"],
+  "icons": {
+    "16": "icon-16.png",
+    "32": "icon-32.png",
+    "48": "icon-48.png",
+    "96": "icon-96.png",
+    "128": "icon-128.png"
+  },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "True Monthly Lease Cost settings"
+    "default_title": "True Monthly Lease Cost settings",
+    "default_icon": {
+      "16": "icon-16.png",
+      "32": "icon-32.png"
+    }
   },
   "content_scripts": [
     {
@@ -30,7 +41,10 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "true-monthly-lease-cost@dac95",
-      "strict_min_version": "109.0"
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   }
 }
