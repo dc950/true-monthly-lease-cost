@@ -117,27 +117,33 @@ function annotateDealPage(): void {
   }
   if (!viable) return;
 
-  const anchor = document.querySelector<HTMLElement>(PRICE_BLOCK_SELECTOR);
-  if (!anchor) return;
+  // The page renders the price block twice — a mobile and a desktop copy,
+  // one of which is hidden at any viewport (verified live 2026-07-17). Badge
+  // both, like the leasing.com deal page does, so the visible one always
+  // carries the badge regardless of layout.
+  const anchors = document.querySelectorAll<HTMLElement>(PRICE_BLOCK_SELECTOR);
+  if (anchors.length === 0) return;
 
   const key = `${terms.monthly}|${terms.term}|${info.mileage}|${terms.initial}`;
-  const existing = anchor.querySelector<HTMLElement>("." + BADGE_CLASS);
-  if (existing?.dataset.lrcKey === key) return;
-  existing?.remove();
-
   const total = totalLeaseCost(terms);
   const real = effectiveMonthly(terms);
   const pct = markupPct(real, terms.monthly);
 
-  const badge = buildBadge({
-    main: `${formatGBP(real)} p/m real`,
-    sub: `${formatGBPWhole(total)} total · +${pct}% vs headline`,
-    title: badgeTitle(terms, total, info.mileage),
-    severity: severity(pct),
+  anchors.forEach((anchor) => {
+    const existing = anchor.querySelector<HTMLElement>("." + BADGE_CLASS);
+    if (existing?.dataset.lrcKey === key) return;
+    existing?.remove();
+
+    const badge = buildBadge({
+      main: `${formatGBP(real)} p/m real`,
+      sub: `${formatGBPWhole(total)} total · +${pct}% vs headline`,
+      title: badgeTitle(terms, total, info.mileage),
+      severity: severity(pct),
+    });
+    badge.classList.add("lrc-nvc-deal");
+    badge.dataset.lrcKey = key;
+    anchor.appendChild(badge);
   });
-  badge.classList.add("lrc-nvc-deal");
-  badge.dataset.lrcKey = key;
-  anchor.appendChild(badge);
 }
 
 export const nationwideVc: SiteAdapter = {
