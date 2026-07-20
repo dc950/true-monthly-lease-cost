@@ -73,6 +73,9 @@ quietly drops one:
 That last case is why LeaseLoco cards cache each deal's all-in total: open a deal from
 a search-results card and its config page badges the exact figure, fee included.
 
+Figures are computed from what each site publishes, and sites change their markup
+without warning. Always confirm against the broker's own quote before signing anything.
+
 ## Settings
 
 Click the toolbar button:
@@ -159,3 +162,7 @@ not re-deriving.
 
 Bug reports are most useful with the page URL and what the badge showed versus what the
 site's own checkout says.
+
+## Licence
+
+MIT — see [LICENSE](LICENSE).
