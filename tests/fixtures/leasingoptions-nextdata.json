@@ -1,0 +1,61 @@
+{
+  "_comment": "Captured 2026-07-17 from __NEXT_DATA__.props.pageProps.topSpecialOffers on https://www.leasingoptions.co.uk/car-leasing/special-offers (two entries, verbatim). This is where listing-card lease profiles live — the card DOM shows only a headline monthly. Each entry: vehicleRef (matches the /<ref>/vehicle segment of the card's stretched-link href), and a deals[] array with contractType 2 = Personal (PCH) and 1 = Business (use PCH). NOTE: `term` is in YEARS (2 = 24 months). initial rental £ = initialRentalMonths * monthlyPrice. Processing fee is NOT here (site-wide £399.99 constant, DOM-only). Pinned for tests: Cupra Terramar PCH -> term 24mo, initial 2567.28, monthly 213.94, +399.99 fee -> total 7887.89, effective 328.66.",
+  "topSpecialOffers": [
+    {
+      "vehicleRef": 1100427683,
+      "make": "Cupra",
+      "model": "Terramar Hatchback",
+      "derivative": "1.5 eTSI 150 V1 5dr DSG",
+      "deals": [
+        {
+          "contractType": 2,
+          "fullName": "Personal Contract Hire",
+          "shortName": "PCH",
+          "mileage": 5000,
+          "term": 2,
+          "maintenance": false,
+          "initialRentalMonths": 12,
+          "monthlyPrice": 213.94
+        },
+        {
+          "contractType": 1,
+          "fullName": "Business Contract Hire",
+          "shortName": "CH",
+          "mileage": 5000,
+          "term": 2,
+          "maintenance": false,
+          "initialRentalMonths": 12,
+          "monthlyPrice": 178.83
+        }
+      ]
+    },
+    {
+      "vehicleRef": 1100438399,
+      "make": "Geely",
+      "model": "Starray Estate",
+      "derivative": "1.5 EM-i Max 5dr Auto",
+      "deals": [
+        {
+          "contractType": 2,
+          "fullName": "Personal Contract Hire",
+          "shortName": "PCH",
+          "mileage": 5000,
+          "term": 2,
+          "maintenance": false,
+          "initialRentalMonths": 12,
+          "monthlyPrice": 208.82
+        },
+        {
+          "contractType": 1,
+          "fullName": "Business Contract Hire",
+          "shortName": "CH",
+          "mileage": 5000,
+          "term": 2,
+          "maintenance": false,
+          "initialRentalMonths": 12,
+          "monthlyPrice": 173.98
+        }
+      ]
+    }
+  ]
+}
