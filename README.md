@@ -4,7 +4,7 @@ A Firefox extension that shows what a UK car lease **actually** costs per month,
 listing pages of the big lease sites — with the initial rental and admin fees spread
 across the contract instead of hidden behind the headline price.
 
-![The badge as it appears on a deal: "£337.10 p/m real, £8,090 total, +50% vs headline"](badge-screenshot.png)
+![A deal card with the badge added: a Volkswagen ID.7 advertised at £380.33 monthly, £13,311.55 total, with the badge showing "£554.65 p/m real, £13,312 total, +46% vs headline"](assets/badge-screenshot.png)
 
 ## The problem
 
