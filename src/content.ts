@@ -1,5 +1,5 @@
 /**
- * Lease Real Cost — content script entry point.
+ * True Monthly Lease Cost — content script entry point.
  *
  * Picks the adapter for the current site and re-scans (debounced) on DOM
  * mutations, since deal lists are client-rendered and extended in place, and

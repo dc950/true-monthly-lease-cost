@@ -162,7 +162,7 @@ function pumpQueue(): void {
           annotateModelCard(card, data, settings);
         }
       })
-      .catch((e) => console.debug("lease-real-cost:", e))
+      .catch((e) => console.debug("true-monthly-lease-cost:", e))
       .finally(() => {
         inFlight--;
         pumpQueue();

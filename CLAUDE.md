@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Firefox MV3 WebExtension ("Lease Real Cost") that annotates UK car-lease sites
+A Firefox MV3 WebExtension ("True Monthly Lease Cost") that annotates UK car-lease sites
 (leasing.com, leaseloco.com) with the true effective monthly cost of each deal:
 
 ```

@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "Lease Real Cost",
-  "version": "0.11.1",
+  "name": "True Monthly Lease Cost",
+  "version": "0.12.0",
   "description": "Shows the true effective monthly cost of lease deals on leasing.com, leaseloco.com, selectcarleasing.co.uk, nationwidevehiclecontracts.co.uk and leasingoptions.co.uk - initial rental and admin fees spread across the full contract term.",
   "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Lease Real Cost settings"
+    "default_title": "True Monthly Lease Cost settings"
   },
   "content_scripts": [
     {
@@ -29,7 +29,7 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "lease-real-cost@dac95",
+      "id": "true-monthly-lease-cost@dac95",
       "strict_min_version": "109.0"
     }
   }

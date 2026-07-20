@@ -1,6 +1,6 @@
 ﻿{
-  "name": "lease-real-cost",
-  "version": "0.11.1",
+  "name": "true-monthly-lease-cost",
+  "version": "0.12.0",
   "private": true,
   "type": "module",
   "scripts": {
