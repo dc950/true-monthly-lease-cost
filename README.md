@@ -61,6 +61,24 @@ advertised headline price, colour-coded:
 Hover the badge for the full breakdown. Deals whose cards lack a term/initial rental
 (e.g. model-level "from £X p/m" tiles) are left untouched.
 
+## selectcarleasing.co.uk
+
+Deal cards (special-offers and browse pages) show the term, initial payment, mileage
+and monthly directly, so they're badged from what's on the card. Select is a broker
+and charges a **site-wide £354 arrangement fee** (inc VAT, verified across deals from
+different funders) that the cards never display, so it's added into the real monthly
+and the hover breakdown notes it as "assumed, site-wide" rather than silently
+understating.
+
+**Individual deal pages** are badged for the currently selected term/mileage/initial
+options, and here the arrangement fee is read **exactly** from the "Your Deal Summary"
+table (falling back to the £354 constant only if that row is ever missing). The badge
+rebuilds when you change options (the page soft-navigates without a full reload). Deal
+pages are a fixed deal, so the term/mileage filters don't apply there.
+
+Not yet handled: model/derivative listing pages (they show only a "from" monthly and
+term) and the business ex-VAT toggle.
+
 ## Settings
 
 Click the toolbar button for a popup with:

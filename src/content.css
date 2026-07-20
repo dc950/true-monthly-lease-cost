@@ -56,6 +56,18 @@
   text-align: left;
 }
 
+/* Select Car Leasing card offer block has its own padding. */
+.lrc-badge.lrc-select {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+/* Select Car Leasing deal-page enquiry price block. */
+.lrc-badge.lrc-select-deal {
+  margin-top: 10px;
+  text-align: left;
+}
+
 /* Deal cards outside the configured term range (see toolbar popup). */
 .lrc-dim {
   opacity: 0.35;
