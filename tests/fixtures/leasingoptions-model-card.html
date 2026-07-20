@@ -1,0 +1,15 @@
+<!-- Captured 2026-07-20 from https://www.leasingoptions.co.uk/car-leasing/electric
+     (trimmed: svg/img/button/input removed, whitespace collapsed).
+     A MODEL card from a category page. Same [class*="card-vehicle_wrapper"]
+     container as a special-offers card, but its stretched-link href is a
+     MODEL page (/car-leasing/peugeot/3008?fuel=3&mileage=5000) with NO
+     /<vehicleRef>/vehicle segment — so vehicleRefFromCard() returns null and
+     the card is skipped today. It must instead be matched to a
+     modelPreviews.dataItems entry by make + shortModelUrl, i.e. the two path
+     segments after /car-leasing/ ("peugeot" / "3008").
+     Note "9 model options available from £218.76" — that displayed "from"
+     price equals the matching entry's PCH monthlyPrice exactly, so badging is
+     exact (see leasingoptions-modelpreviews.json for the pinned numbers).
+     Deeper hrefs (4+ segments, ending /<ref>/vehicle) are derivative/deal
+     cards and stay on the existing vehicleRef path. -->
+<div class="card-vehicle_wrapper__gLTrx bg-white"><div class="card-vehicle_header__shtJ5"><h3 class="card-vehicle_title__UQyj4"><a class="stretched-link" href="/car-leasing/peugeot/3008?fuel=3&amp;mileage=5000" data-mida-tracked8212="true">Peugeot 3008</a></h3></div><div class="card-vehicle_content__2_AEH"><div class="card-vehicle_summary__55az8 "><span class="d-inline-block me-3"><strong>Body Type: </strong>SUV / Crossover</span><span><div class="star-block_stars__e7M77 stretched-link-above star-block_is-vehicle__evvCh d-flex justify-content-start flex-nowrap star-block_star--large__UC0N2" data-rating="5"><div class="d-flex flex-nowrap"></div></div></span></div><div class="card-vehicle_usps__ANZmI"><span><strong>5<!-- --> Seats</strong></span><span><strong>5<!-- --> Doors</strong></span><span><strong>Auto</strong></span><span><strong>Electric</strong></span></div><span class="card-vehicle_strapline__0ZjKS"><strong class="d-inline-block me-1">9 model</strong>options available from</span><div class="card-vehicle_bar__PZGoA"><div class="card-vehicle_pricing__h4Cjw"><div class="card-vehicle_money__0ZZT8"><span class="overflow-hidden"><mark>£</mark><span class="">218.76</span></span><small class="overflow-hidden">p/m<br><span class="">Inc. VAT</span></small></div><div class="card-vehicle_info__3rSGA"><div class="card-vehicle_delivery__bm544"><strong> Delivery</strong><span>Available now</span></div></div></div></div><div class="card-vehicle_ctas__LzkrV"></div></div></div>

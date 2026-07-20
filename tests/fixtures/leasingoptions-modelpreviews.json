@@ -1,0 +1,76 @@
+{
+  "_comment": "Captured 2026-07-20 from __NEXT_DATA__.props.pageProps.modelPreviews on https://www.leasingoptions.co.uk/car-leasing/electric (two dataItems, verbatim apart from dropped image/feature/review arrays). NOTE THE SHAPE: unlike topSpecialOffers (a plain array), modelPreviews is an OBJECT wrapping its array in `dataItems` — which is why buildOfferMap, iterating only array-valued pageProps, skipped it entirely and category/model pages got no badges. Entries carry the same {vehicleRef, deals} shape as topSpecialOffers, PLUS `make` and `shortModelUrl` which are what model cards link by (/car-leasing/peugeot/3008), since model-card hrefs have no /<ref>/vehicle segment. Pinned for tests: Peugeot 3008 PCH -> term 24mo (2 years x12), mileage 5000, monthly 218.76, initial 2625.12 (12 x monthly), +399.99 fee -> total 8056.59, effective 335.69. The card's displayed 'from £218.76' equals this deal's monthlyPrice exactly, so the badge is exact.",
+  "modelPreviews": {
+    "totalVehiclesCount": 0,
+    "totalItemsCount": 10,
+    "totalPagesCount": 1,
+    "pageIndex": 0,
+    "pageSize": 10,
+    "dataItems": [
+      {
+        "$type": "car",
+        "vehiclesCount": 9,
+        "shortModelUrl": "3008",
+        "vehicleRef": 1100417231,
+        "make": "Peugeot",
+        "shortModel": "3008",
+        "model": "E-3008 Electric Estate",
+        "derivative": "157kW GT 73kWh 5dr Auto",
+        "deals": [
+          {
+            "contractType": 2,
+            "fullName": "Personal Contract Hire",
+            "shortName": "PCH",
+            "mileage": 5000,
+            "term": 2,
+            "maintenance": false,
+            "initialRentalMonths": 12,
+            "monthlyPrice": 218.76
+          },
+          {
+            "contractType": 1,
+            "fullName": "Business Contract Hire",
+            "shortName": "CH",
+            "mileage": 5000,
+            "term": 2,
+            "maintenance": false,
+            "initialRentalMonths": 12,
+            "monthlyPrice": 181.89
+          }
+        ]
+      },
+      {
+        "$type": "car",
+        "vehiclesCount": 4,
+        "shortModelUrl": "id-7",
+        "vehicleRef": 1100429895,
+        "make": "Volkswagen",
+        "shortModel": "ID.7",
+        "model": "ID.7 Hatchback",
+        "derivative": "210kW Match Pro Plus 77kWh 5dr Auto",
+        "deals": [
+          {
+            "contractType": 2,
+            "fullName": "Personal Contract Hire",
+            "shortName": "PCH",
+            "mileage": 5000,
+            "term": 2,
+            "maintenance": false,
+            "initialRentalMonths": 12,
+            "monthlyPrice": 312.93
+          },
+          {
+            "contractType": 1,
+            "fullName": "Business Contract Hire",
+            "shortName": "CH",
+            "mileage": 5000,
+            "term": 2,
+            "maintenance": false,
+            "initialRentalMonths": 12,
+            "monthlyPrice": 260.83
+          }
+        ]
+      }
+    ]
+  }
+}
