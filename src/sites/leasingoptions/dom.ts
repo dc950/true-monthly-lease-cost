@@ -141,20 +141,41 @@ export function extractDealPageInfo(root: ParentNode): DealPageInfo | null {
 }
 
 /**
- * Special-offers listing cards (/car-leasing/special-offers). The card DOM
- * carries no term/initial/fee, only vehicle identity - the lease profile is
- * looked up from __NEXT_DATA__ (see nextdata.ts) by vehicleRef, which is
- * embedded in the title anchor's href.
+ * Special-offers listing cards (/car-leasing/special-offers) AND
+ * manufacturer/category "model preview" cards (e.g. /car-leasing/electric)
+ * share this same wrapper class. Neither carries term/initial/fee on the
+ * card DOM, only vehicle identity - the lease profile is looked up from
+ * __NEXT_DATA__ (see nextdata.ts), by vehicleRef for the former and by a
+ * make/shortModelUrl slug for the latter (model cards' hrefs have no
+ * vehicleRef segment at all - see modelSlugFromCard below).
  */
 export const SPECIAL_OFFER_CARD_SELECTOR = '[class*="card-vehicle_wrapper"]';
 
 /**
- * The vehicleRef embedded in a special-offers card's stretched-link href,
- * e.g. ".../1100427683/vehicle?isdefault=1..." -> 1100427683. Null when the
- * card has no such link (e.g. an unrelated element).
+ * The vehicleRef embedded in a special-offers (or derivative) card's
+ * stretched-link href, e.g. ".../1100427683/vehicle?isdefault=1..." ->
+ * 1100427683. Null when the card has no such link (e.g. an unrelated
+ * element, or a model card - see modelSlugFromCard).
  */
 export function vehicleRefFromCard(card: Element): number | null {
   const href = card.querySelector("a.stretched-link")?.getAttribute("href") ?? "";
   const m = href.match(/\/(\d{6,})\/vehicle/);
   return m ? parseInt(m[1], 10) : null;
+}
+
+/**
+ * The make/shortModelUrl slug embedded in a model card's stretched-link
+ * href, e.g. "/car-leasing/peugeot/3008?fuel=3&mileage=5000" ->
+ * "peugeot/3008" (lowercased, query stripped). Model cards have no
+ * vehicleRef segment at all, unlike derivative cards, whose hrefs run
+ * deeper and end "/<ref>/vehicle" - so this only matches when there are
+ * EXACTLY two path segments after /car-leasing/, leaving deeper hrefs to
+ * vehicleRefFromCard instead. Null when the card has no stretched-link, or
+ * its href isn't shaped like a model page.
+ */
+export function modelSlugFromCard(card: Element): string | null {
+  const href = card.querySelector("a.stretched-link")?.getAttribute("href") ?? "";
+  const path = href.split("?")[0];
+  const m = path.match(/^\/car-leasing\/([^/]+)\/([^/]+)$/);
+  return m ? `${m[1].toLowerCase()}/${m[2].toLowerCase()}` : null;
 }

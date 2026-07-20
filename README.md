@@ -99,7 +99,7 @@ progressively as you browse into deals and back, not on first load.
 
 ## leasingoptions.co.uk
 
-Two kinds of pages are handled:
+Three kinds of pages are handled:
 
 **Individual deal pages** are badged exactly from what's on the page: the headline
 monthly, and the Finance Summary panel's contract length, annual mileage and initial
@@ -119,8 +119,16 @@ The £399.99 fee (never present in `__NEXT_DATA__`, DOM-only elsewhere) is folde
 same way as on deal pages, so these badges are exact too. Term/mileage settings filters
 apply.
 
-Not yet handled: manufacturer/category "model preview" pages, which show model-level
-"from" prices in a different data shape.
+**Manufacturer/category "model preview" pages** (e.g. `/car-leasing/electric`) show the
+same card layout, but its title link points at a model page
+(`/car-leasing/peugeot/3008`) rather than a specific vehicle, so there's no vehicle
+reference to look up. These cards are instead matched to their `__NEXT_DATA__` profile
+(nested under `modelPreviews.dataItems` rather than a plain array, unlike the
+special-offers page) by make and model-URL slug. The card's displayed "from" price is
+that profile's own PCH monthly exactly (not the cheapest of several derivatives), so the
+badge is exact, same as the other two page kinds. Derivative cards on these pages (whose
+links go deeper, straight to a vehicle) still resolve via the vehicle-reference lookup
+above.
 
 ## Settings
 

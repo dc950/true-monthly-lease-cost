@@ -16,9 +16,10 @@ import {
   LEASINGOPTIONS_FEE,
   SPECIAL_OFFER_CARD_SELECTOR,
   extractDealPageInfo,
+  modelSlugFromCard,
   vehicleRefFromCard,
 } from "./dom";
-import { extractOfferProfiles, type SpecialOfferProfile } from "./nextdata";
+import { extractOfferProfiles, type OfferProfileMaps } from "./nextdata";
 
 /**
  * Individual deal pages: badge the price block with the real monthly for
@@ -76,19 +77,21 @@ function annotateDealPage(): void {
 }
 
 /**
- * Special-offers listing cards: the card DOM has no lease numbers at all,
- * only vehicle identity, so the profile comes from __NEXT_DATA__ looked up
- * by the vehicleRef embedded in the card's title link. The map is parsed at
- * most once per scan (only if there's at least one un-badged card to look
- * up). Cards with no matching profile (e.g. business-only, or the data
- * genuinely absent) are left untouched, as are non-PCH-only vehicles that
- * never resolve to a profile.
+ * Special-offers listing cards AND category/model preview cards: the card
+ * DOM has no lease numbers at all, only vehicle/model identity, so the
+ * profile comes from __NEXT_DATA__ - looked up by the vehicleRef embedded
+ * in the card's title link (special-offers and derivative cards), falling
+ * back to a make/shortModelUrl slug lookup (model cards, whose hrefs carry
+ * no vehicleRef at all). The maps are parsed at most once per scan (only if
+ * there's at least one un-badged card to look up). Cards with no matching
+ * profile (e.g. business-only, or the data genuinely absent) are left
+ * untouched, as are non-PCH-only vehicles that never resolve to a profile.
  */
-function annotateSpecialOfferCards(settings: Settings): void {
+function annotateOfferCards(settings: Settings): void {
   const cards = document.querySelectorAll<HTMLElement>(SPECIAL_OFFER_CARD_SELECTOR);
   if (cards.length === 0) return;
 
-  let profiles: Map<number, SpecialOfferProfile> | null = null;
+  let profiles: OfferProfileMaps | null = null;
 
   cards.forEach((card) => {
     let term: number;
@@ -101,10 +104,13 @@ function annotateSpecialOfferCards(settings: Settings): void {
     }
 
     const ref = vehicleRefFromCard(card);
-    if (ref === null) return; // no title link to identify the vehicle
+    const slug = modelSlugFromCard(card);
+    if (ref === null && slug === null) return; // no title link to identify the vehicle/model
 
     profiles ??= extractOfferProfiles(document);
-    const profile = profiles.get(ref);
+    const profile =
+      (ref !== null ? profiles.byRef.get(ref) : undefined) ??
+      (slug !== null ? profiles.bySlug.get(slug) : undefined);
     if (!profile) return; // no PCH profile for this card - leave it alone
 
     term = profile.term;
@@ -144,6 +150,6 @@ export const leasingOptions: SiteAdapter = {
   },
   scan(settings) {
     annotateDealPage();
-    annotateSpecialOfferCards(settings);
+    annotateOfferCards(settings);
   },
 };
