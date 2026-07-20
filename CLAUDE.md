@@ -5,15 +5,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 A Firefox MV3 WebExtension ("True Monthly Lease Cost") that annotates UK car-lease sites
-(leasing.com, leaseloco.com) with the true effective monthly cost of each deal:
+(leasing.com, leaseloco.com, selectcarleasing.co.uk, nationwidevehiclecontracts.co.uk,
+leasingoptions.co.uk) with the true effective monthly cost of each deal:
 
 ```
 real monthly = (initial rental + monthly × (term − 1) + admin fees) / term
 ```
 
-Firefox-only by deliberate decision (personal use; Chrome deferred unless it's ever
-shipped). There is no backend/webapp — the extension is the whole project. PLAN.md's
-webapp section is obsolete; its leasing.com API notes are still accurate.
+Firefox-only for now; a Chrome build is plausible (nothing depends on Firefox-specific
+APIs beyond the `browser` namespace) but isn't done. There is no backend/webapp — the
+extension is the whole project, MIT-licensed and headed for public release. An earlier
+PLAN.md proposed a fetch-and-rank webapp; that was abandoned and the file deleted, and
+the leasing.com API details it carried now live in `sites/leasingcom/api.ts` as a typed
+interface plus the verified facts below.
 
 ## Commands
 
