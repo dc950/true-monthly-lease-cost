@@ -68,6 +68,18 @@
   text-align: left;
 }
 
+/* Nationwide Vehicle Contracts listing card. */
+.lrc-badge.lrc-nvc {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+/* Nationwide Vehicle Contracts deal-page price block. */
+.lrc-badge.lrc-nvc-deal {
+  margin-top: 10px;
+  text-align: left;
+}
+
 /* Deal cards outside the configured term range (see toolbar popup). */
 .lrc-dim {
   opacity: 0.35;

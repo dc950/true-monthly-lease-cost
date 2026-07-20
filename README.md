@@ -79,6 +79,24 @@ pages are a fixed deal, so the term/mileage filters don't apply there.
 Not yet handled: model/derivative listing pages (they show only a "from" monthly and
 term) and the business ex-VAT toggle.
 
+## nationwidevehiclecontracts.co.uk
+
+**Individual deal pages** are the exact surface: monthly, initial rental, contract
+length, annual mileage and the processing fee are all in the "Order summary" panel for
+whatever term/mileage/options are currently selected, so the badge is always precise.
+Changing an option swaps the page in place (no reload, no JSON quote API), and the
+badge rebuilds to match.
+
+**Listing cards** (`/car-leasing/deals` and manufacturer/search pages) show a "From"
+monthly, the initial rental and the processing fee — but no term and no mileage, so a
+card alone can't be badged exactly. Instead, every deal page you open gets its exact
+quote remembered (sessionStorage, keyed by the deal's URL) so that when you're back on
+a listing, a card for that same deal is badged from the cached quote — but **only**
+when the cached quote's monthly matches the card's advertised price; if they differ
+(the cache reflects whichever term you last viewed, not necessarily the card's "From"
+profile), the card is left unbadged rather than guessing. In practice: cards get badged
+progressively as you browse into deals and back, not on first load.
+
 ## Settings
 
 Click the toolbar button for a popup with:
